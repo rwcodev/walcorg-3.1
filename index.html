@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="es">
+	<head>
+<!-- ////////////// Agregar TAG de rastreo de Google Analytics ///////////// -->
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-6PKCJ3K9Q1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-6PKCJ3K9Q1');
+</script>
+<!-- ////////////// Agregar TAG de rastreo de Google Analytics ///////////// -->
+		<meta charset="UTF-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="author" content="Rafael Walter" />
+		<meta name="description" content="Portfolio of Rafael Walter Contreras Ortega as a Full Stack Web Developer" />
+		<meta name="keywords" content="full, stack, web, developer, embedded, linux, yocto"/>
+		<meta name="theme-color" content="#09f" />
+		<!-- Fuente  -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Poppins:wght@200;300;400;500;600;700;800;900&display=swap"
+			rel="stylesheet"
+		/>
+		<!-- Iconos  -->
+		<link
+			href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css"
+			rel="stylesheet"
+		/>
+
+		<title>CO2 capture | WALCORG INC.</title>
+
+		<link rel="icon" href="./assets/img/icon.jpg" type="image/jpg">
+		<link rel="stylesheet" href="/css/style_03.css" />
+		<script type="module" src="assets/js/main.js"></script>
+		<script type="module" src="send_form.js"></script>
+		<!-- //////////////////// Script for QUERY RESPONSE ////////////////////  -->
+
+
+		<!-- ///////////////////////////////////////////////////////////////////  -->
+
+		<script src="language.js"></script> <!-- Doesn´t work if you put this file in another folder/level  -->
+	</head>
+	
+	<body>
+		<header class="header">
+			<nav class="navbar grid--container flex--container">
+				<a class="navbar__logo flex--container" href="#">
+					<i class="bx bx-registered"></i>
+					<p id="text_000">WALCORG</p>
+				</a>
+				
+				<div id="nav" class="navbar__menu">
+					<a href="#close"
+						><i class="bx bx-x btn__close navbar__icon flex--container"></i
+					></a>
+				
+
+					<ul class="navbar__list flex--container">
+						<li class="navbar__item">
+							<a class="navbar__link active" href="login.html" id="text_001">Login</a>
+						</li>
+						<li class="navbar__item">
+							<a class="navbar__link" href="login.html" id="text_002">Register</a>
+						</li>
+						<li class="navbar__item">
+							<a class="navbar__link" href="public-exchange.html" id="text_003">Exchange</a>
+						</li>
+						<li class="navbar__item">
+							<a class="navbar__link" href="e-downloads.html" id="text_004">Downloads</a>
+						</li>
+						<li class="navbar__item">
+							<a class="navbar__link" href="earth-emissions.html" id="text_005">US</a>
+						</li>
+					</ul>
+				</div>
+				<a href="#nav"><i class="bx bx-menu btn__open navbar__icon"></i></a>
+			</nav>
+		</header>
+		<main>
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<section id="home" class="home">
+				<div id="container" class="one">                
+						
+					<span id="year1980" class="year"></span>
+					<span id="year2000" class="year"></span>
+					<span id="year2020" class="year"></span>
+				
+					 <script type="text/javascript" src="/globe/third-party/Detector.js"></script>
+					 <script type="text/javascript" src="/globe/third-party/three.min.js"></script>
+					 <script type="text/javascript" src="/globe/third-party/Tween.js"></script>
+					 <script type="text/javascript" src="/globe/globe-giratory.js"></script>
+					 <script type="text/javascript">
+				
+					 if(!Detector.webgl){
+						Detector.addGetWebGLMessage();
+					  } else {        
+						var years = ['1980','2000','2020'];
+						var container = document.getElementById('container');
+						var globe = new DAT.Globe(container);        
+						//   console.log(globe);
+						 var i, tweens = [];
+					  
+						 var settime = function(globe, t) {
+						  return function() {
+								new TWEEN.Tween(globe).to({time: t/years.length},500).easing(TWEEN.Easing.Cubic.EaseOut).start();
+								var y = document.getElementById('year'+years[t]);
+								if (y.getAttribute('class') === 'year active') {return;}
+								var yy = document.getElementsByClassName('year');
+								for(i=0; i<yy.length; i++) {yy[i].setAttribute('class','year');}
+								y.setAttribute('class', 'year active');
+							};
+						};              
+							 for(var i = 0; i<years.length; i++) {var y = document.getElementById('year'+years[i]); y.addEventListener('mouseover', settime(globe,i), false);}              
+						var xhr;
+						TWEEN.start();       
+						xhr = new XMLHttpRequest();
+						xhr.open('GET', '/globe/co2-concentration.json', true);
+						xhr.onreadystatechange = function(e) {
+							if (xhr.readyState === 4) {
+							 if (xhr.status === 200) {
+							   var data = JSON.parse(xhr.responseText);
+							   window.data = data;
+							   for (i=0;i<data.length;i++) {globe.addData(data[i][1], {format: 'magnitude', name: data[i][0], animated: true});}
+							  globe.createPoints();
+							  settime(globe,0)();
+							  globe.animate();
+							  document.body.style.backgroundImage = 'none'; // remove loading
+						   }
+						 }
+					   };
+						xhr.send(null);
+					 }        
+						</script>
+				</div>
+				<div class="home__container grid--container">
+					<div class="home__image">
+						<img
+							src="/assets/img/logo.jpg"
+							alt="logotipo of WALCORG TERRAFORMING CORPORATION"
+							title="Walcorg INC"
+						/>
+					</div>		
+					<div class="home__info">
+						
+						<h1 class="home__title"><p id="text_006">Are you ready?...</p></h1>
+
+						<p class="home__description">
+							<p id="text_007">CARBON CAPTURE TROUGHT TOKEN CREATION.</p>
+
+						</p>
+					</div>
+
+					<div class="home__buttons">
+						<a
+							class="btn btn--primary"
+							href="https://drive.google.com/file/d/1YZviEPWxhcTKOq0t6LtYmydcfX1YM-Lw/view"
+							title="Descargar mi CV"
+							download="CV_R_Walter_Full_Stack_Web_Developer"
+							rel="noreferrer nofollow"
+							target="_blank"
+						><p id="text_008">Download Clorela OS</p></a>
+					</div>
+				</div>
+			</section>
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<section id="about" class="about section">
+				<h2 class="section__title"><p id="text_009">PHOTOBIORREACTORS WITH EMBEDDED BLOCKCHAIN TECHNOLOGY.</p></h2>
+
+				<div class="about__container grid--container">
+					<!-- <p class="about__description">
+						<p id="text_010">.</p>						
+					</p> -->
+
+					<div class="about__cards flex--container">
+						<!--Card 1 -->
+						<div class="about__card"><p>OPEN SOURCE HARDWARE</p>
+							<img
+								class="about__card--img"
+								src="/assets/img/workflow_01.jpg"
+								alt="Workflow"
+								title="4° node generation"
+							/>
+						</div>
+						<!--Card 2 -->
+						<div class="about__card"><P>OPEN SOURCE SOFTWARE</P>
+							<img
+								class="about__card--img"
+								src="/assets/img/workflow _02.jpg"
+								alt="Clorela-OS"
+								title="Clorela-OS and website"
+							/>
+						</div>
+						<!--Card 3 -->
+						<div class="about__card"><P>CO2 CAPTURED</P>
+							<img
+								class="about__card--img"
+								src="/assets/img/workflow_03.jpg"
+								alt="Workflow"
+								title="Workflow"
+							/>
+						</div>
+						<!--Card 3 -->
+						<div class="about__card" ><P>CO2iN TOKEN</P>
+							
+							<img 
+								class="about__card--img"
+								src="/assets/img/workflow_04.jpg"
+								alt="Workflow"
+								title="Workflow"								
+							/>
+							<!-- <a href="https://www.starlink.com" target="_blank"></a>							 -->
+						</div>
+					</div>
+				</div>
+			</section>
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<section id="skills" class="skills section">
+				<h2 class="section__title"><p id="text_011">OPEN SOURCE SOLUTION</p></h2>
+
+				<div class="skills__container grid--container">
+					<!-- <p class="skills__description flex--container">
+						<p id="text_012">....</p>						
+					</p> -->
+
+					<div class="skills__wrapper flex--container">
+						<div class="skills__cards flex--container">
+
+
+
+					
+								<!--Card 1 -->
+								<div class="skills__card"><p>NODES & FILTER</p>
+									<img
+										class="about__card--img"
+										src="/assets/img/hardware.png"
+										alt="Workflow"
+										title="4° node generation"
+									/>
+								</div>
+
+									<!--Card 1 -->
+									<div class="skills__card"><p>IN-HOUSE ALGORYTHM</p>
+										<img
+											class="about__card--img"
+											src="/assets/img/transition.jpg"
+											alt="Workflow"
+											title="4° node generation"
+										/>
+									</div>
+	
+						
+										<!--Card 1 -->
+										<div class="skills__card"><p>ENCRYPTED DATA</p>
+											<img
+												class="about__card--img"
+												src="/assets/img/cypher.png"
+												alt="Workflow"
+												title="4° node generation"
+											/>
+										</div>
+								</div>
+					</div>					
+				</div>
+			</section>
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<section id="projects" class="projects section">
+				<h2 class="section__title"><p id="text_024">EASY TO SET UP</p></h2>
+
+				<div class="projects__container grid--container">
+					<div class="projects__project">
+						<div class="projects__inner grid--container">
+
+
+							<div class="projects__image">
+								<img
+									src="assets/img/walcorg-engineer.jpg"
+									alt="project 1"
+									title="walcorg"
+								/>
+							</div>
+
+							<div class="projects__image">
+								<img
+									src="assets/img/easy-list.jpg"
+									alt="project 1"
+									title="walcorg"
+								/>
+							</div>
+
+							<div class="projects__image">
+								<img
+									src="assets/img/walcorg-app-02.png"
+									alt="project 1"
+									title="walcorg"
+								/>
+							</div>
+
+
+
+						</div>
+					</div>									
+				</div>
+
+
+			</section>
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<section id="contact" class="contact section">
+				<h2 class="section__title"><p id="text_042">PARTNERSHIPS</p></h2>
+
+				<div class="contact__container grid--container">
+					<div class="contact__info">
+						<h3 class="contact__info-title"><p id="text_043">Google, Xprize</p></h3>
+						<p class="contact__info-description">
+							<p id="text_044">PRESENCE IN MORE THAN 200 COUNTRYES ALL OVER THE PLANET.</p>
+						</p>
+
+						<address class="contact__info-data">
+							<div class="contact__info-item">
+								<i class="bx bx-scatter-chart" ></i>
+
+								<span class="contact__info-number">
+									<a
+										href="https://wa.me/+529516691970?text=Tu%20Mensaje%20De%20Texto"
+										target="_blank"
+										rel="noreferrer nofollow"
+										><p id="text_045">Active team at XPRIZE CARBON REMOVAL.</p></a
+									>
+								</span>
+							</div>
+
+							<div class="contact__info-item">
+								<span class="contact__info-number">
+									<a
+										href="123"
+										target="_blank"
+										rel="noreferrer nofollow"
+									>										
+									</a>
+								</span>
+							</div>				
+
+							<div class="contact__info-item">										
+								<span class="contact__info-map"> 
+								<a
+									href="https://maps.app.goo.gl/FeE7QhEHKe3GD5qj6"
+									target="_blank"
+									rel="noreferrer nofollow"
+									>
+									Delaware, U.S.A.  
+								</a>
+								</span>
+							</div>
+							
+						</address>
+					</div>
+			</section>
+		</main>
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+			<!-- /////////////////////////////////////////////////////////// -->
+		<footer class="footer section">
+			<div class="footer__container grid--container">
+				<div class="footer__info">
+					<h3 class="footer__title">Legal disclaimer</h3>
+					<p class="footer__description">
+						<p id="text_054">Get updates to your Email</p>
+					</p>
+				</div>
+
+				<div class="footer__social">
+					<h3 class="footer__title"><p id="text_055">Social Networks</p></h3>
+
+					<ul class="footer__social-list">
+						<li class="footer__social-item">
+							<a
+								class="footer__social-link"
+								href="https://www.facebook.com/walcorg"
+								target="_blank"
+								rel="noreferrer nofollow"
+								><i class="bx bxl-facebook"></i
+							></a>
+						</li>
+
+						<li class="footer__social-item">
+							<a
+								class="footer__social-link"
+								href="https://www.youtube.com/@WALCORGTERRAFORMINGCORPORATION"
+								target="_blank"
+								rel="noreferrer nofollow"
+								><i class='bx bxl-youtube'></i
+							></a>
+						</li>
+
+						<li class="footer__social-item">
+							<a
+								class="footer__social-link"
+								href="https://twitter.com/walcorg"
+								target="_blank"
+								rel="noreferrer nofollow"
+								><i class="bx bxl-twitter"></i
+							></a>
+						</li>
+
+						<li class="footer__social-item">
+							<a
+								class="footer__social-link"
+								href="https://www.linkedin.com/in/rafael-walter-c-0b063221"
+								target="_blank"
+								rel="noreferrer nofollow"
+								><i class="bx bxl-linkedin"></i
+							></a>
+						</li>
+					</ul>
+				</div>
+			</div>
+
+			<p class="footer__copy"><p id="text_056">WALCORG® TERRAFORMING CORPORATION IT'S A USA ENTERPRISE.</p></p>
+		</footer>
+	</body>
+</html>
