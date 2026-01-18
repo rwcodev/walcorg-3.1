@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>OUR FIRST 100 NFT's HOLDERS — WALCORG</title>
+  <style>
+    :root{
+      --bg:#030303;
+      --card:#17a113;
+      --muted:#c9c9c9;
+      --accent:#00e6c3;
+    }
+    html,body{height:100%;margin:0;background:var(--bg);color:#fff;font-family:Inter,system-ui,Arial,sans-serif;}
+    .wrap{max-width:1200px;margin:32px auto;padding:24px;}
+    header{ text-align:center;margin-bottom:20px;}
+    h1{font-size:28px;letter-spacing:1px;margin:0;}
+    p.lead{color:var(--muted);margin:6px 0 20px;}
+    /* grid */
+    .grid{display:grid;grid-template-columns:repeat(10,1fr);gap:18px;}
+    .cell{
+      background:var(--card);
+      aspect-ratio:1/1;
+      border-radius:6px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.6);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;position:relative;overflow:hidden;
+      transition:transform .12s ease, box-shadow .12s ease;
+    }
+    .cell:hover{ transform:translateY(-6px); box-shadow:0 10px 30px rgba(0,0,0,0.7); }
+    .cell .placeholder{ color:rgba(255,255,255,0.95); font-weight:700; font-size:14px; text-align:center; padding:6px;}
+    .cell img.logo { width:100%; height:100%; object-fit:cover; display:block; }
+    .cell .overlay {
+      position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,0) 40%, rgba(0,0,0,0.5) 100%);
+      display:flex;align-items:flex-end;justify-content:center;padding:8px; box-sizing:border-box;
+    }
+    .overlay small{ color:#fff; font-size:11px; opacity:0.95; text-shadow:0 1px 2px rgba(0,0,0,0.6); }
+    /* modal */
+    .modal-backdrop{ position:fixed; inset:0; background:rgba(0,0,0,0.6); display:none; align-items:center; justify-content:center; z-index:60; }
+    .modal{ width:720px; max-width:95%; background:#0b0b0b; border-radius:8px; padding:18px; box-shadow:0 20px 60px rgba(0,0,0,0.7); }
+    .modal h2{ margin:0 0 8px; font-size:18px;}
+    .row{ display:flex; gap:12px; margin-bottom:12px; }
+    .col{ flex:1; }
+    label{ display:block; font-size:13px; color:var(--muted); margin-bottom:6px; }
+    input[type="text"], input[type="file"], textarea {
+      width:100%; padding:8px 10px; border-radius:6px; border:1px solid #222; background:#0f0f0f; color:#fff;
+    }
+    button{
+      background:var(--accent); color:#002; border:none; padding:10px 14px; border-radius:6px; font-weight:700; cursor:pointer;
+    }
+    .btn-ghost{ background:transparent; border:1px solid #222; color:var(--muted); padding:8px 12px; border-radius:6px; }
+    .meta{ font-size:13px; color:var(--muted); margin-top:6px;}
+    .top-actions{ display:flex; gap:12px; justify-content:center; margin-bottom:16px; }
+    /* small screens */
+    @media (max-width:760px){
+      .grid{ grid-template-columns:repeat(5,1fr); gap:12px; }
+      .row{ flex-direction:column; }
+    }
+  </style>
+  <!-- Optional: include ethers.js from CDN for wallet verification -->
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.6.0/dist/ethers.min.js"></script>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>OUR FIRST 100 NFT's HOLDERS — THANK YOU</h1>
+      <p class="lead">This grid honors the first 100 wallets that supported the WALCORG NFT launch. Click any tile to reveal or claim your slot. Owners can verify with MetaMask.</p>
+      <div class="top-actions">
+        <button id="connectWalletBtn">I already buy one, add my name</button>
+        <button id="refreshBtn" class="btn-ghost">Refresh grid</button>
+      </div>
+    </header>
+
+    <main>
+      <div id="holdersGrid" class="grid" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <!-- Modal -->
+  <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+    <div class="modal" role="document">
+      <h2 id="modalTitle">Holder slot</h2>
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:12px;">
+        <div style="width:110px;height:110px;background:#111;border-radius:6px;overflow:hidden;display:flex;align-items:center;justify-content:center" id="previewBox">
+          <span style="color:#666;font-size:12px;">No Logo</span>
+        </div>
+        <div style="flex:1;">
+          <div id="slotInfo" class="meta">Slot: <span id="slotIndex">-</span> &nbsp; • &nbsp; Owner: <span id="slotOwner">unclaimed</span></div>
+          <div class="meta" id="slotClaimedAt"></div>
+        </div>
+      </div>
+
+      <form id="claimForm">
+        <div class="row">
+          <div class="col">
+            <label for="holderName">Full name</label>
+            <input id="holderName" name="holderName" type="text" placeholder="Jane Doe / Company rep" />
+          </div>
+          <div class="col">
+            <label for="holderCompany">Company</label>
+            <input id="holderCompany" name="holderCompany" type="text" placeholder="Company (optional)" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col">
+            <label for="logoFile">Upload logo (square)</label>
+            <input id="logoFile" name="logoFile" type="file" accept="image/*" />
+          </div>
+          <div class="col">
+            <label>&nbsp;</label>
+            <div style="display:flex;gap:8px;">
+              <button id="saveBtn" type="button">Save Claim</button>
+              <button id="clearBtn" type="button" class="btn-ghost">Clear</button>
+              <button id="closeBtn" type="button" class="btn-ghost">Close</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <small class="meta">Verification: You must connect your wallet and sign a small message to prove ownership of the wallet that holds the NFT. This demo uses local storage if no server is configured.</small>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<script>
+/*
+  first100.html
+  - Grid 10x10 (=100 slots)
+  - Click a slot to open modal
+  - If claimed, shows logo, name, company and owner wallet (short)
+  - Demo persistence uses localStorage; replace saveClaim() fetch() POST to your backend to persist on server
+  - Simple wallet verification flow using ethers.js (MetaMask)
+*/
+
+const GRID_SIZE = 100;
+const gridEl = document.getElementById('holdersGrid');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const slotIndexEl = document.getElementById('slotIndex');
+const slotOwnerEl = document.getElementById('slotOwner');
+const slotClaimedAtEl = document.getElementById('slotClaimedAt');
+const previewBox = document.getElementById('previewBox');
+const holderNameInput = document.getElementById('holderName');
+const holderCompanyInput = document.getElementById('holderCompany');
+const logoFileInput = document.getElementById('logoFile');
+const saveBtn = document.getElementById('saveBtn');
+const clearBtn = document.getElementById('clearBtn');
+const closeBtn = document.getElementById('closeBtn');
+const connectWalletBtn = document.getElementById('connectWalletBtn');
+const refreshBtn = document.getElementById('refreshBtn');
+
+let activeSlot = null;
+let walletAddress = null;
+let provider = null;
+
+// load existing claims from localStorage or empty
+function loadClaims(){
+  try {
+    const raw = localStorage.getItem('walcorg_first100');
+    if(!raw) return {};
+    return JSON.parse(raw);
+  } catch(e){
+    console.error(e);
+    return {};
+  }
+}
+function saveClaims(obj){
+  localStorage.setItem('walcorg_first100', JSON.stringify(obj));
+}
+
+// utility: short address
+function shortAddr(addr){
+  if(!addr) return 'unclaimed';
+  return addr.slice(0,6) + '...' + addr.slice(-4);
+}
+
+// render grid
+function renderGrid(){
+  gridEl.innerHTML = '';
+  const claims = loadClaims();
+  for(let i=1;i<=GRID_SIZE;i++){
+    const id = String(i);
+    const slot = claims[id];
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    cell.dataset.slot = id;
+
+    if(slot && slot.logoData){
+      const img = document.createElement('img');
+      img.className = 'logo';
+      img.src = slot.logoData;
+      img.alt = slot.name || 'holder logo';
+      cell.appendChild(img);
+      const ov = document.createElement('div');
+      ov.className = 'overlay';
+      const sm = document.createElement('small');
+      sm.textContent = slot.company || slot.name || 'Holder';
+      ov.appendChild(sm);
+      cell.appendChild(ov);
+    } else {
+      const ph = document.createElement('div');
+      ph.className = 'placeholder';
+      ph.textContent = 'Slot ' + id;
+      cell.appendChild(ph);
+    }
+    cell.addEventListener('click', onCellClick);
+    gridEl.appendChild(cell);
+  }
+}
+
+// cell click handler
+function onCellClick(e){
+  const slot = e.currentTarget.dataset.slot;
+  activeSlot = slot;
+  openModal(slot);
+}
+
+// open modal (load data)
+function openModal(slot){
+  const claims = loadClaims();
+  const data = claims[slot] || null;
+  slotIndexEl.textContent = slot;
+  if(data){
+    slotOwnerEl.textContent = shortAddr(data.wallet || null);
+    slotClaimedAtEl.textContent = 'Claimed: ' + (data.claimedAt || 'unknown');
+    holderNameInput.value = data.name || '';
+    holderCompanyInput.value = data.company || '';
+    if(data.logoData){
+      previewBox.innerHTML = `<img src="${data.logoData}" style="width:100%;height:100%;object-fit:cover">`;
+    } else {
+      previewBox.innerHTML = '<span style="color:#666;font-size:12px;">No Logo</span>';
+    }
+  } else {
+    slotOwnerEl.textContent = 'unclaimed';
+    slotClaimedAtEl.textContent = '';
+    holderNameInput.value = '';
+    holderCompanyInput.value = '';
+    previewBox.innerHTML = '<span style="color:#666;font-size:12px;">No Logo</span>';
+  }
+  modalBackdrop.style.display = 'flex';
+}
+
+// close modal
+function closeModal(){
+  modalBackdrop.style.display = 'none';
+  activeSlot = null;
+  logoFileInput.value = '';
+}
+
+// connect wallet (ethers.js)
+async function connectWallet(){
+  if(!window.ethereum){
+    alert('MetaMask or an injected wallet is required for verification.');
+    return;
+  }
+  try {
+    provider = new ethers.BrowserProvider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+    walletAddress = accounts[0];
+    connectWalletBtn.textContent = shortAddr(walletAddress);
+    connectWalletBtn.disabled = true;
+  } catch(err){
+    console.error(err);
+    alert('Wallet connection cancelled or failed.');
+  }
+}
+
+// handle file preview
+logoFileInput.addEventListener('change', function(e){
+  const f = e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    previewBox.innerHTML = `<img src="${ev.target.result}" style="width:100%;height:100%;object-fit:cover">`;
+  };
+  reader.readAsDataURL(f);
+});
+
+// Save claim (local demo or POST to server)
+saveBtn.addEventListener('click', async function(){
+  if(!activeSlot) return;
+  // basic fields
+  const name = holderNameInput.value.trim();
+  const company = holderCompanyInput.value.trim();
+
+  // require wallet verification
+  if(!walletAddress){
+    if(!confirm('You are not connected with a wallet. Save locally? (No on-chain verification)')) {
+      return;
+    }
+    // proceed but will be saved locally without wallet
+  } else {
+    // ask the user to sign a short message to prove ownership
+    try {
+      const signer = await provider.getSigner();
+      const msg = `I claim slot ${activeSlot} on WALCORG FIRST 100 — ${new Date().toISOString()}`;
+      const sig = await signer.signMessage(msg);
+      // signature could be sent to backend for verification + to prove wallet ownership
+      console.log('signature', sig);
+    } catch(err){
+      console.error(err);
+      alert('Signature failed. Claim aborted.');
+      return;
+    }
+  }
+
+  // prepare logo (if any) as dataURL
+  let logoData = null;
+  const f = logoFileInput.files[0];
+  if(f){
+    // read synchronously via Promise
+    logoData = await new Promise((res,rej)=>{
+      const r = new FileReader();
+      r.onload = () => res(r.result);
+      r.onerror = () => rej('read fail');
+      r.readAsDataURL(f);
+    });
+  }
+
+  // Build claim object
+  const claims = loadClaims();
+  claims[activeSlot] = {
+    name: name || '',
+    company: company || '',
+    wallet: walletAddress || null,
+    claimedAt: new Date().toLocaleString(),
+    logoData: logoData
+  };
+
+  // Optionally: send to server
+  // Example fetch (uncomment and adapt endpoint):
+  /*
+  await fetch('/api/claim', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json' },
+    body: JSON.stringify({ slot: activeSlot, claim:claims[activeSlot], signature: sig })
+  });
+  */
+
+  // fallback: save locally
+  saveClaims(claims);
+  renderGrid();
+  closeModal();
+});
+
+// clear
+clearBtn.addEventListener('click', function(){
+  if(!activeSlot) return;
+  if(!confirm('Clear claim for slot ' + activeSlot + '?')) return;
+  const claims = loadClaims();
+  delete claims[activeSlot];
+  saveClaims(claims);
+  renderGrid();
+  closeModal();
+});
+
+// close modal
+closeBtn.addEventListener('click', closeModal);
+modalBackdrop.addEventListener('click', function(e){
+  if(e.target === modalBackdrop) closeModal();
+});
+
+// buttons
+connectWalletBtn.addEventListener('click', connectWallet);
+refreshBtn.addEventListener('click', renderGrid);
+
+// init
+renderGrid();
+
+</script>
+</body>
+</html>
